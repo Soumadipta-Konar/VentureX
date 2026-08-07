@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Re-Energize | Retired EV Battery Aggregation & Grading Engine (India)</title>
+  <meta name="description" content="India B2C Sourcing & B2B Institutional Demand Aggregation Platform for Retired EV Batteries featuring 2-stage SOH grading and EPR valuation.">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js for degradation curve visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- HEADER & BENCHMARK TICKER -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand-container">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="brand-title">
+          <h1>Re-Energize EV</h1>
+          <p>Battery Aggregation, SOH Grading & Institutional Secondary Exchange — India</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="tag-regulatory">MoEFCC BWMR 2022 Compliant</span>
+      </div>
+    </div>
+
+    <!-- Active Market Benchmarks Ticker -->
+    <div class="benchmark-bar" id="benchmarkBar">
+      <div class="benchmark-item">
+        <span class="benchmark-label">Informal Scrap Baseline:</span>
+        <span class="benchmark-val" id="bmScrapRate">₹1,450 / kWh</span>
+        <span class="tag-calibrated">Illustrative</span>
+      </div>
+      <div class="benchmark-item">
+        <span class="benchmark-label">Est. EPR Credit (LFP):</span>
+        <span class="benchmark-val" id="bmEprLfp">₹520 / kWh</span>
+        <span class="tag-regulatory">Sourced BWMR 2022</span>
+      </div>
+      <div class="benchmark-item">
+        <span class="benchmark-label">Est. EPR Credit (NMC):</span>
+        <span class="benchmark-val" id="bmEprNmc">₹680 / kWh</span>
+        <span class="tag-regulatory">Sourced BWMR 2022</span>
+      </div>
+      <div class="benchmark-item">
+        <span class="benchmark-label">New Lead-Acid Alt:</span>
+        <span class="benchmark-val" id="bmLeadAcid">₹5,200 / kWh</span>
+        <span class="tag-calibrated">Illustrative</span>
+      </div>
+      <div class="benchmark-item">
+        <span class="benchmark-label">New Lithium Alt:</span>
+        <span class="benchmark-val" id="bmNewLithium">₹12,500 / kWh</span>
+        <span class="tag-calibrated">Illustrative</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS WITH CLEAN SVG ICONS -->
+  <div class="nav-tabs-container">
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-b2c">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="11" x2="23" y2="13"/></svg>
+        1. B2C Seller Valuation & Pickup Verification
+      </button>
+      <button class="tab-btn" data-tab="tab-b2b">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>
+        2. B2B Institutional Demand & Supply Pool
+      </button>
+      <button class="tab-btn" data-tab="tab-simulator">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        3. Chemistry Degradation Simulator (LFP vs NMC)
+      </button>
+      <button class="tab-btn" data-tab="tab-methodology">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        4. Formula & Regulatory Methodology
+      </button>
+    </nav>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="main-content">
+
+    <!-- TAB 1: B2C SELLER VALUATION & PHYSICAL VERIFICATION -->
+    <div id="tab-b2c" class="tab-pane active">
+      
+      <div class="grid-2col">
+
+        <!-- LEFT: Seller Inputs -->
+        <div class="card">
+          <div class="card-title">
+            <span>Stage 1: Vehicle & Battery Declaration</span>
+            <span class="title-badge">Provisional Intake</span>
+          </div>
+
+          <div class="preset-buttons">
+            <span style="font-size: 0.8rem; color: var(--text-muted); align-self: center; font-weight: 500;">Quick Presets:</span>
+            <button class="preset-btn" onclick="applyPreset('ola')">2022 Ola S1 Pro (2W LFP)</button>
+            <button class="preset-btn" onclick="applyPreset('treo')">2021 Mahindra Treo (3W LFP)</button>
+            <button class="preset-btn" onclick="applyPreset('nexon')">2020 Nexon EV (4W NMC)</button>
+          </div>
+
+          <form id="sellerForm" onsubmit="event.preventDefault(); runProvisionalValuation();">
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="vehicleCategory">Vehicle Category *</label>
+                <select id="vehicleCategory" class="form-select" onchange="handleCategoryChange()">
+                  <option value="2W">2-Wheeler (Scooter/Bike)</option>
+                  <option value="3W" selected>3-Wheeler / E-Rikshaw</option>
+                  <option value="4W">4-Wheeler (Passenger/Fleet)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="batteryChemistry">Battery Chemistry *</label>
+                <select id="batteryChemistry" class="form-select">
+                  <option value="LFP" selected>LFP (Lithium Iron Phosphate)</option>
+                  <option value="NMC">NMC (Nickel Manganese Cobalt)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="packAge">Pack Age (Years) *</label>
+                <input type="number" id="packAge" class="form-control" min="0.5" max="10" step="0.5" value="3.5" required>
+              </div>
+              <div class="form-group">
+                <label for="packCapacity">Pack Capacity (kWh) *</label>
+                <input type="number" id="packCapacity" class="form-control" min="1" max="100" step="0.5" value="7.5" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="odometerKm">Odometer Reading (Km) *</label>
+              <input type="number" id="odometerKm" class="form-control" min="0" max="300000" step="500" value="45000" oninput="syncCyclesFromKm()">
+              <small style="color: var(--text-muted); font-size: 0.78rem;" id="cycleEstimateHelp">Est. Cycle Count: ~818 cycles (based on ~55 km/cycle for 3W)</small>
+            </div>
+
+            <!-- Advanced Optional Collapsible -->
+            <details style="margin-bottom: 1.25rem; background: var(--bg-card-subtle); padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <summary style="cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan);">
+                ⚙️ Optional Advanced Operating Conditions (DoD & Temperature)
+              </summary>
+              <div class="form-row" style="margin-top: 0.75rem;">
+                <div class="form-group">
+                  <label for="avgDoD">Avg Depth-of-Discharge (DoD %)</label>
+                  <input type="number" id="avgDoD" class="form-control" min="30" max="100" value="80">
+                </div>
+                <div class="form-group">
+                  <label for="avgTemp">Avg Operating Temp (°C)</label>
+                  <input type="number" id="avgTemp" class="form-control" min="15" max="50" value="32">
+                </div>
+              </div>
+            </details>
+
+            <button type="submit" class="btn-primary">
+              Calculate Provisional Valuation & SOH Grade ➔
+            </button>
+          </form>
+        </div>
+
+        <!-- RIGHT: Provisional Valuation Result -->
+        <div class="card" id="provisionalResultCard">
+          <div class="card-title">
+            <span>Valuation Result</span>
+            <span class="result-header-badge badge-provisional" id="provBadge">Provisional Estimate</span>
+          </div>
+
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.5rem;">
+            <div>
+              <div class="metric-big" id="provSohVal" style="color: var(--accent-emerald);">73.4%</div>
+              <div class="metric-sub">Estimated SOH based on usage history</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="result-header-badge" id="provGradeBadge">Grade B</div>
+              <div class="metric-sub" id="provGradeName" style="margin-top: 4px;">Telecom Tower Backup</div>
+            </div>
+          </div>
+
+          <!-- Dynamic Visual Capacity Meter Bar -->
+          <div style="margin: 0.75rem 0 1.25rem 0;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">
+              <span>Remaining Capacity Health</span>
+              <span id="sohMeterLabel">73.4% SOH</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="sohMeterFill" style="width: 73.4%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+            </div>
+          </div>
+
+          <!-- Dynamic Loss Breakdown Bar -->
+          <div style="background: var(--bg-card-subtle); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem;">
+            <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+              <span>Degradation Loss Attribution</span>
+              <button onclick="openCalculationTraceModal()" style="background: none; border: none; color: var(--accent-cyan); font-weight: 600; cursor: pointer; font-size: 0.75rem;">View Formula Trace 🔍</button>
+            </div>
+            <div style="display: flex; gap: 1rem; font-size: 0.78rem;">
+              <div>• Cyclic Loss: <strong id="provCyclicLoss">18.2%</strong></div>
+              <div>• Calendar Aging: <strong id="provCalendarLoss">8.4%</strong></div>
+              <div>• Thermal Multiplier: <strong id="provThermalMult">1.23x</strong></div>
+            </div>
+          </div>
+
+          <div class="payout-box">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Estimated Seller Payout:</div>
+            <div class="payout-total" id="provTotalPayout">₹24,150</div>
+            <div style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 600; margin-top: 2px;" id="provScrapComparison">
+              +67% higher than un-graded informal scrap (₹10,875)
+            </div>
+
+            <table class="breakdown-table">
+              <tr>
+                <td>Platform Base Valuation:</td>
+                <td id="provBasePayout">₹20,250</td>
+              </tr>
+              <tr>
+                <td>
+                  Est. EPR Credit:
+                  <span class="tag-regulatory" style="font-size: 0.65rem;">BWMR 2022</span>
+                </td>
+                <td id="provEprCredit">₹3,900</td>
+              </tr>
+              <tr>
+                <td>Informal Scrap Benchmark:</td>
+                <td id="provScrapBaseline" style="color: var(--text-dim);">₹10,875</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--bg-app); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-amber); margin-bottom: 0.25rem;">
+              🛡️ Liability & Warranty Structure:
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-main);" id="provWarrantyTerms">
+              18-Month Prorated Warranty. Guaranteed >=55% capacity retention.
+            </div>
+          </div>
+
+          <div class="disclaimer-box" id="provDisclaimer">
+            📌 <strong>Important Note:</strong> This is a provisional online estimate computed from self-reported data. Final payout is confirmed after doorstep pickup and technician verification.
+          </div>
+
+          <!-- Printable Certificate Export Button -->
+          <button onclick="openCertificateModal()" class="btn-secondary" style="width: 100%; margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <span>📄</span> Generate Official Valuation Certificate (PDF/Print)
+          </button>
+        </div>
+
+      </div>
+
+      <!-- STAGE 2: DOORSTEP TECHNICIAN INSPECTION SIMULATOR -->
+      <div class="card inspection-card" style="margin-top: 1.5rem;">
+        <div class="card-title" style="border-bottom-color: #bae6fd;">
+          <span>Stage 2: Doorstep Technician Inspection & Final Re-Grading Simulator</span>
+          <span class="result-header-badge badge-verified">Stage 2 Final Payout</span>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Simulate doorstep inspection checks conducted by platform field technicians upon battery pickup to verify physical condition, terminal voltage, and BMS cycle logs.
+        </p>
+
+        <div class="grid-2col">
+          <!-- Technician Controls -->
+          <div>
+            <div class="form-group">
+              <label class="checkbox-group">
+                <input type="checkbox" id="techVisualDamage" onchange="runVerifiedValuation()">
+                <span>⚠️ Visual Casing / Water / Structural Damage Present</span>
+              </label>
+              <small style="color: var(--accent-amber); display: block; margin-top: 0.25rem;">
+                (Checking this caps grade at Grade C / Reject regardless of SOH%)
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="techTerminalVoltage">Measured Terminal Voltage (V)</label>
+              <input type="number" id="techTerminalVoltage" class="form-control" step="0.5" value="47.8" oninput="runVerifiedValuation()">
+              <small style="color: var(--text-dim);" id="nominalVoltageRef">Nominal: 48.0V</small>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-group">
+                <input type="checkbox" id="techBmsAccessible" checked onchange="runVerifiedValuation()">
+                <span>🔌 Sync BMS Logged Cycle Data</span>
+              </label>
+            </div>
+
+            <div class="form-group" id="bmsCyclesGroup">
+              <label for="techBmsCycles">Actual BMS Logged Cycle Count</label>
+              <input type="number" id="techBmsCycles" class="form-control" value="820" oninput="runVerifiedValuation()">
+              <small style="color: var(--text-dim);">Compare against self-reported (~818 cycles). Deviations >15% trigger auto-re-grading.</small>
+            </div>
+          </div>
+
+          <!-- Verified Final Result -->
+          <div style="background: #ffffff; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-emerald); margin-bottom: 0.5rem;">
+              Verified Final Result (Post-Pickup)
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-emerald);" id="verSohVal">73.4%</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);" id="verSohDiff">No change vs Stage 1</div>
+              </div>
+              <div>
+                <span class="result-header-badge" id="verBadge">Grade B Verified</span>
+              </div>
+            </div>
+
+            <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-emerald);" id="verFinalPayout">
+              Final Payout: ₹24,150
+            </div>
+
+            <div style="margin-top: 0.75rem; font-size: 0.8rem;" id="verInspectionFlags">
+              <div style="color: var(--accent-emerald);">✓ BMS Verification Passed: Logged cycles match within margin.</div>
+              <div style="color: var(--accent-emerald);">✓ Voltage Check Passed: Terminal voltage healthy.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: B2B INSTITUTIONAL DEMAND & AGGREGATED POOL -->
+    <div id="tab-b2b" class="tab-pane">
+      
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-title">
+          <span>Aggregated Graded Capacity Inventory (Live Supply Pool)</span>
+          <!-- Dynamic Filter Buttons -->
+          <div style="display: flex; gap: 0.5rem; font-size: 0.8rem;">
+            <button class="preset-btn filter-btn active" onclick="filterB2BPool('ALL')">All Tiers</button>
+            <button class="preset-btn filter-btn" onclick="filterB2BPool('GRADE_A')">Grade A</button>
+            <button class="preset-btn filter-btn" onclick="filterB2BPool('GRADE_B')">Grade B</button>
+            <button class="preset-btn filter-btn" onclick="filterB2BPool('GRADE_C')">Grade C</button>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Platform aggregates verified graded batteries into institutional bulk pools for telecom towers, solar micro-grids, and commercial UPS leases.
+        </p>
+
+        <div style="overflow-x: auto;">
+          <table class="data-table" id="poolTable">
+            <thead>
+              <tr>
+                <th>Grade Tier</th>
+                <th>Avg SOH</th>
+                <th>Primary Chemistry</th>
+                <th>Available Capacity</th>
+                <th>Target Application</th>
+                <th>Price / kWh</th>
+                <th>Warranty</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dynamic JS rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- B2B Bulk Order & Cost Savings Calculator -->
+      <div class="grid-2col">
+        <div class="card">
+          <div class="card-title">
+            <span>Institutional Bulk Procurement Simulator</span>
+            <span class="title-badge">Secondary Exchange</span>
+          </div>
+
+          <form id="b2bForm" onsubmit="event.preventDefault(); runB2BQuote();">
+            <div class="form-group">
+              <label for="b2bSegment">Buyer Industry Segment *</label>
+              <select id="b2bSegment" class="form-select" onchange="runB2BQuote()">
+                <option value="TELECOM_TOWER">Telecom Tower Backup (Replaces Short-Lived Lead Acid)</option>
+                <option value="SOLAR_MICROGRID">Solar Micro-Grid BESS (High Cycle Life Required)</option>
+                <option value="COMMERCIAL_UPS">Commercial Building UPS & Data Centers</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="b2bCapacityKWh">Required Capacity (kWh) *</label>
+                <input type="number" id="b2bCapacityKWh" class="form-control" min="10" max="10000" step="10" value="250" oninput="runB2BQuote()">
+              </div>
+              <div class="form-group">
+                <label for="b2bRequestedGrade">Preferred Battery Grade *</label>
+                <select id="b2bRequestedGrade" class="form-select" onchange="runB2BQuote()">
+                  <option value="GRADE_A">Grade A (>80% SOH - BESS Grade)</option>
+                  <option value="GRADE_B" selected>Grade B (65-80% SOH - Telecom Grade)</option>
+                  <option value="GRADE_C">Grade C (50-65% SOH - UPS Grade)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="b2bChemistry">Chemistry Requirement</label>
+              <select id="b2bChemistry" class="form-select" onchange="runB2BQuote()">
+                <option value="LFP">LFP (Recommended for Solar / Telecom)</option>
+                <option value="NMC">NMC</option>
+              </select>
+            </div>
+          </form>
+        </div>
+
+        <!-- B2B Quote Output -->
+        <div class="card">
+          <div class="card-title">
+            <span>Institutional Price & ROI Benchmark</span>
+            <span class="tag-calibrated">Illustrative Benchmarks</span>
+          </div>
+
+          <div style="font-size: 0.85rem; color: var(--text-muted);" id="b2bSegmentLabel">
+            Telecom Tower Backup Procurement (250 kWh Grade B)
+          </div>
+
+          <div class="payout-box">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Platform Graded Bulk Price:</div>
+            <div class="payout-total" id="b2bTotalPrice">₹10,25,000</div>
+            <div style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 600;" id="b2bUnitPrice">
+              ₹4,100 / kWh
+            </div>
+          </div>
+
+          <table class="breakdown-table">
+            <tr>
+              <td>Cost vs New Lithium Alternative (₹12,500/kWh):</td>
+              <td id="b2bVsLithium" style="color: var(--accent-emerald); font-weight: 700;">Save ₹21,00,000 (67% Savings)</td>
+            </tr>
+            <tr>
+              <td>Cost vs New Lead-Acid Alternative (₹5,200/kWh):</td>
+              <td id="b2bVsLeadAcid" style="color: var(--accent-cyan); font-weight: 600;">Save ₹2,75,000 (21% Capital Savings)</td>
+            </tr>
+            <tr>
+              <td>Avoided Manufacturing CO₂ Offset:</td>
+              <td id="b2bCo2Offset" style="color: var(--accent-emerald); font-weight: 700;">21.3 Tons CO₂ Avoided</td>
+            </tr>
+          </table>
+
+          <small style="color: var(--text-dim); display: block; margin-top: 1rem; font-size: 0.75rem;">
+            * Benchmark comparisons use illustrative market average procurement rates for commercial pack assemblies in India.
+          </small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: CHEMISTRY DEGRADATION SIMULATOR -->
+    <div id="tab-simulator" class="tab-pane">
+      <div class="grid-2col">
+        <div class="card">
+          <div class="card-title">
+            <span>Live Degradation Parameter Controls</span>
+            <span class="title-badge">Empirical Physics</span>
+          </div>
+
+          <div class="form-group">
+            <label>Battery Chemistry</label>
+            <select id="simChemistry" class="form-select" onchange="updateSimChart()">
+              <option value="LFP" selected>LFP (Flatter, longer cycle degradation curve)</option>
+              <option value="NMC">NMC (Steeper cycle degradation, heat sensitive)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Pack Age (Years)</label>
+            <div class="slider-container">
+              <input type="range" id="simAge" min="0.5" max="10" step="0.5" value="3" oninput="updateSimChart()">
+              <span class="slider-val" id="simAgeVal">3 yrs</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Depth of Discharge (DoD %)</label>
+            <div class="slider-container">
+              <input type="range" id="simDoD" min="20" max="100" step="5" value="80" oninput="updateSimChart()">
+              <span class="slider-val" id="simDoDVal">80 %</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Average Operating Temperature (°C)</label>
+            <div class="slider-container">
+              <input type="range" id="simTemp" min="15" max="50" step="1" value="32" oninput="updateSimChart()">
+              <span class="slider-val" id="simTempVal">32 °C</span>
+            </div>
+          </div>
+
+          <div style="padding: 1rem; background: var(--bg-app); border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.85rem;" id="simSummaryText">
+            <!-- Dynamic JS text -->
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>SOH% vs Cycle Life Curve (LFP vs NMC)</span>
+            <span class="title-badge">Dynamic Chart</span>
+          </div>
+          <div style="position: relative; height: 320px;">
+            <canvas id="degradationChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: FORMULA & REGULATORY METHODOLOGY -->
+    <div id="tab-methodology" class="tab-pane">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-title">
+          <span>Grading & Valuation Methodology Transparency</span>
+          <span class="tag-regulatory">MoEFCC BWMR 2022</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          
+          <!-- Sourced Category -->
+          <div style="background: var(--badge-emerald-bg); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(5,150,105,0.3);">
+            <h3 style="color: var(--badge-emerald-text); font-size: 1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🏛️</span> Category 1: Sourced / Regulatory Mandates
+            </h3>
+            <ul style="font-size: 0.88rem; padding-left: 1.2rem; color: var(--text-main);">
+              <li style="margin-bottom: 0.5rem;">
+                <strong>Battery Waste Management Rules (BWMR) 2022:</strong> Notified by MoEFCC, Govt of India. Mandates Extended Producer Responsibility (EPR) credit trading for battery producers and recyclers.
+              </li>
+              <li style="margin-bottom: 0.5rem;">
+                <strong>EPR Credit Valuation Mechanism:</strong> Platform calculates estimated EPR credit value per kWh transferred for certified second-life or material recycling, rewarding higher recovery chemistry (NMC > LFP).
+              </li>
+              <li>
+                <strong>Second-Life Battery Safety Standards:</strong> Refers to Bureau of Indian Standards (BIS) and AIS-156 safety requirements for second-life pack re-certification.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Illustrative Category -->
+          <div style="background: var(--badge-amber-bg); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(217,119,6,0.3);">
+            <h3 style="color: var(--badge-amber-text); font-size: 1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🧪</span> Category 2: Illustrative / Calibrated Parameters
+            </h3>
+            <ul style="font-size: 0.88rem; padding-left: 1.2rem; color: var(--text-main);">
+              <li style="margin-bottom: 0.5rem;">
+                <strong>Degradation Physics Constants:</strong> Cycle degradation exponents ($\alpha$), calendar aging rates (%/yr), and Arrhenius thermal decay coefficients are empirical values calibrated to published literature (NREL/IEEE).
+              </li>
+              <li style="margin-bottom: 0.5rem;">
+                <strong>Benchmark Prices (₹/kWh):</strong> Informal scrap baselines (~₹1,450/kWh), New Lead-Acid (~₹5,200/kWh), and New Lithium (~₹12,500/kWh) are market-average estimates (not sourced from a single proprietary company dataset).
+              </li>
+              <li>
+                <strong>Cycle Estimation Ratio:</strong> Km-to-cycle conversion factors (2W: 40 km/cycle, 3W: 55 km/cycle, 4W: 120 km/cycle) reflect nominal real-world range assumptions.
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div style="margin-top: 1.5rem; background: var(--bg-app); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 0.5rem;">Mathematical Degradation Model Formulation</h4>
+          <p style="font-size: 0.85rem; color: var(--text-main); font-family: monospace;">
+            SOH% = 100 - [ 20 × (N_cycles / N_nominal)^α × (1 + 0.6 × (DoD% - 80)/100) + (Cal_rate × Age_yrs × e^(0.03 × (Temp°C - 25))) ]
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: VALUATION CERTIFICATE EXPORT -->
+  <div id="certificateModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📄 Official Battery Valuation & EPR Credit Certificate</h3>
+        <button class="modal-close" onclick="closeCertificateModal()">✕</button>
+      </div>
+      <div class="modal-body" id="certificateContent">
+        <!-- Dynamic Certificate JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeCertificateModal()">Close</button>
+        <button class="btn-primary" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FORMULA TRACE CALCULATOR -->
+  <div id="traceModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🔍 Engine Formula Calculation Trace</h3>
+        <button class="modal-close" onclick="closeCalculationTraceModal()">✕</button>
+      </div>
+      <div class="modal-body" id="traceContent">
+        <!-- Dynamic Formula Trace JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeCalculationTraceModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>Re-Energize EV Battery Aggregation & Grading Engine • Built for India B2C EV Battery Sourcing & B2B Institutional Secondary Exchange</p>
+  </footer>
+
+  <!-- Include Backend Engine & App Logic -->
+  <script src="gradingEngine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

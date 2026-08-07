@@ -1,0 +1,90 @@
+# Re-Energize EV — Battery Aggregation & Grading Platform (India)
+
+> **B2C Sourcing + B2B Institutional Secondary Exchange for Retired Electric Vehicle Batteries**
+> 
+> Compliant with Ministry of Environment, Forest and Climate Change (MoEFCC) **Battery Waste Management Rules (BWMR) 2022**.
+
+---
+
+## ⚡ Overview
+
+**Re-Energize EV** is an end-to-end aggregation and valuation platform for retired EV batteries in India. It bridges individual EV owners/fleet operators (B2C Sourcing) with institutional secondary energy storage buyers (B2B Telecom Towers, Solar Micro-Grids, Commercial UPS).
+
+The core of the platform is an **Empirical Electrochemistry Degradation Engine** that computes dynamic State-of-Health (SOH), 4-tier grade classification, prorated performance warranty terms, itemized Extended Producer Responsibility (EPR) credit payouts, and doorstep physical technician verification.
+
+---
+
+## 🚀 Key Features
+
+### 1. Two-Stage SOH Grading & Valuation Pipeline
+- **Stage 1 (Provisional Estimate)**: Self-reported usage intake (Vehicle Category, Chemistry, Age, Km/Cycles, DoD%, Ambient Temperature). Labeled transparently as *"Estimated SOH based on usage history"*.
+- **Stage 2 (Doorstep Physical Verification)**: Doorstep inspection syncs BMS logged cycle counts, checks terminal voltage drops, and inspects visual casing/water damage (caps grade at Grade C / Reject if damaged).
+- **Discrepancy Re-Grading**: Automatically flags BMS log deviations (>15% vs self-reported) and recalibrates verified SOH.
+
+### 2. Empirical Chemistry Degradation Physics (LFP vs. NMC)
+- **LFP (Lithium Iron Phosphate)**: Base cycle life ~2,800 cycles to 80% SOH, lower calendar decay (~1.2%/yr), low thermal sensitivity.
+- **NMC (Nickel Manganese Cobalt)**: Base cycle life ~1,600 cycles to 80% SOH, higher calendar decay (~2.2%/yr), higher Arrhenius thermal decay above 25°C.
+- **Physics Equations**:
+  - $\text{Degradation}_{\text{cyclic}} = 20.0 \times \left(\frac{N_{\text{cycles}}}{N_{\text{nominal}}}\right)^\alpha \times (1 + 0.6 \cdot \frac{\text{DoD}\% - 80}{100})$
+  - $\text{Degradation}_{\text{calendar}} = (\text{Cal}_{\text{rate}} \times \text{Age}_{\text{yrs}}) \times e^{\gamma (T_{\text{avg}} - 25^\circ\text{C})}$
+
+### 3. Tiered Grading & Prorated Performance Warranties
+- **Grade A (>80% SOH)**: Commercial Storage (BESS) & Solar Micro-Grids (36-Month Prorated Warranty, $\ge 70\%$ capacity guarantee).
+- **Grade B (65–80% SOH)**: Telecom Tower Backup (18-Month Prorated Warranty, $\ge 55\%$ capacity guarantee).
+- **Grade C (50–65% SOH)**: Low-Stakes UPS & Emergency Lighting (As-Is / 90-Day DOA replacement).
+- **Reject (<50% SOH)**: Black Mass Hydrometallurgical Recycling (EPR Safe Transfer Clearance).
+
+### 4. Itemized Seller Payout & EPR Credit Mechanism
+- Payout = Platform Base Valuation + **Estimated EPR Credit (BWMR 2022)**.
+- Compares seller payout directly against un-graded informal scrap benchmarks (~₹1,450/kWh), demonstrating a 50%–250% seller premium.
+
+### 5. Institutional B2B Secondary Exchange
+- Bulk procurement quote simulator for Telecom, Solar Micro-Grids, and Commercial UPS.
+- Institutional price benchmarked against New Lead-Acid (~₹5,200/kWh) and New Lithium (~₹12,500/kWh), including avoided manufacturing $\text{CO}_2$ offset calculations.
+
+### 6. Transparency & Reporting
+- **Dynamic Visual Capacity Meter**: Dynamic fill color and health percentage gauge.
+- **Interactive Formula Trace Modal**: Step-by-step mathematical computation trace.
+- **Printable Official Valuation Report**: Generates a PDF/Print certificate complete with unique tracking ID, vehicle metadata, and itemized payout details.
+
+---
+
+## 📦 Project Architecture
+
+```
+├── index.html        # Responsive Single-Page SaaS Application UI
+├── style.css         # Stripe/Linear-style Light Mode Design System
+├── app.js            # Frontend Interactions, Modals, Filters & Chart.js Integration
+├── gradingEngine.js  # Pure JavaScript Backend Electrochemistry Physics & Valuation Engine
+└── README.md         # Documentation
+```
+
+---
+
+## 🛠️ Quick Start / Local Setup
+
+1. **Clone Repository**:
+   ```bash
+   git clone https://github.com/Soumadipta-Konar/VentureX.git
+   cd VentureX
+   ```
+
+2. **Run Locally**:
+   Simply open `index.html` in any web browser, or launch a local web server:
+   ```bash
+   python -m http.server 8080
+   ```
+   Then navigate to `http://localhost:8080`.
+
+---
+
+## 📜 Compliance & Citations
+
+- **Regulatory Compliance**: Extended Producer Responsibility (EPR) credit mechanisms aligned with the **Battery Waste Management Rules (BWMR) 2022** notified by the Ministry of Environment, Forest and Climate Change (MoEFCC), Govt of India.
+- **Empirical Calibration**: Degradation curve parameters, cycle life limits, and Arrhenius thermal constants are calibrated to published NREL and IEEE battery degradation datasets.
+
+---
+
+## 👤 Author
+
+- **Soumadipta Konar** ([GitHub](https://github.com/Soumadipta-Konar))
