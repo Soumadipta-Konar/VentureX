@@ -26,7 +26,7 @@ The core of the platform is an **Empirical Electrochemistry Degradation Engine**
 - **NMC (Nickel Manganese Cobalt)**: Base cycle life ~1,600 cycles to 80% SOH, higher calendar decay (~2.2%/yr), higher Arrhenius thermal decay above 25°C.
 - **Physics Equations**:
   - $\text{Degradation}_{\text{cyclic}} = 20.0 \times \left(\frac{N_{\text{cycles}}}{N_{\text{nominal}}}\right)^\alpha \times (1 + 0.6 \cdot \frac{\text{DoD}\% - 80}{100})$
-  - $\text{Degradation}_{\text{calendar}} = (\text{Cal}_{\text{rate}} \times \text{Age}_{\text{yrs}}) \times e^{\gamma (T_{\text{avg}} - 25^\circ\text{C})}$
+  - $\text{Degradation}_{\text{calendar}} = (\text{Cal}_{\text{rate}} \times \text{Age}_{\text{yrs}}) \times e^{\gamma (T_{\text{avg}} - 25)}$
 
 ### 3. Tiered Grading & Prorated Performance Warranties
 - **Grade A (>80% SOH)**: Commercial Storage (BESS) & Solar Micro-Grids (36-Month Prorated Warranty, $\ge 70\%$ capacity guarantee).
@@ -101,7 +101,7 @@ VentureX/
 
 ### 1. Research Datasets for Offline Model Calibration
 - **NASA Ames Battery Aging Dataset**: Standard benchmark for capacity fade & internal resistance growth (B0005, B0006, B0007, B0018).
-- **CALCE Battery Research Dataset (Univ. of Maryland)**: LFP & NMC cell degradation data under varying thermal stresses ($25^\circ\text{C}$–$45^\circ\text{C}$) and C-rates.
+- **CALCE Battery Research Dataset (Univ. of Maryland)**: LFP & NMC cell degradation data under varying thermal stresses (25°C – 45°C) and C-rates.
 - **Stanford / MIT Battery Dataset (Severson et al.)**: 124 LFP/Graphite cells under dynamic charge/discharge profiles.
 - **Oxford Battery Degradation Dataset**: Long-term drive-cycle battery degradation logs.
 
@@ -114,7 +114,7 @@ VentureX/
 ## 🗺️ Future Strategic Roadmap
 
 - **Phase 1 (Q1-Q2)**: Doorstep OBD-II / BMS Hardware Dongle for automated 60-second diagnostic health verification.
-- **Phase 2 (Q3-Q4)**: Physics-Informed Neural Network (PINN) automated re-calibration using regional Indian thermal data ($35^\circ\text{C}$–$48^\circ\text{C}$).
+- **Phase 2 (Q3-Q4)**: Physics-Informed Neural Network (PINN) automated re-calibration using regional Indian thermal data (35°C – 48°C).
 - **Phase 3 (Year 2)**: Automated EPR Credit Clearinghouse & Direct Integration with Central Pollution Control Board (CPCB) EPR Portal.
 - **Phase 4 (Year 2-3)**: Secondary Storage-as-a-Service (ESaaS) leasing for Indian Telecom Towers (Indus Towers) & Solar Micro-Grids.
 
@@ -127,7 +127,7 @@ VentureX/
 
 ---
 
-## 👥 About Team 'Team Incognito'
+## 👥 About 'Team Incognito'
 
 - **Gyan Ranjan** — Technical Build
 - **Soumadipta Konar** — Business Model and Unit Economics
