@@ -1,0 +1,19 @@
+{
+  "name": "venturex-battery-engine",
+  "version": "1.0.0",
+  "description": "Modular Electrochemistry Battery Aggregation & SOH Grading Engine",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --input-type=module -e \"import * as Engine from './src/index.js'; console.log(Engine.determineGrade(90));\""
+  },
+  "keywords": [
+    "ev-battery",
+    "soh-grading",
+    "battery-aggregation",
+    "bwmr-2022",
+    "electrochemistry"
+  ],
+  "author": "Soumadipta Konar",
+  "license": "MIT"
+}
