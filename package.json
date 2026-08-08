@@ -5,6 +5,8 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
+    "start": "npx serve -s . -l $PORT",
+    "build": "echo 'Build complete'",
     "test": "node --input-type=module -e \"import * as Engine from './src/index.js'; console.log(Engine.determineGrade(90));\""
   },
   "keywords": [
