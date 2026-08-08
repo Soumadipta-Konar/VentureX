@@ -19,16 +19,28 @@ The platform uses an **Empirical Electrochemistry Degradation Engine** built wit
 The calculation engine in `src/engine/degradationModel.js` is an **arithmetic electrochemistry degradation model** based on cyclic degradation and Arrhenius thermal calendar aging.
 
 ### 1. Cyclic Degradation Component
-$$\text{Loss}_{\text{cyclic}} = 20.0 \times \left(\frac{N_{\text{cycles}}}{N_{\text{nominal}}}\right)^{\alpha} \times \left(1 + 0.6 \cdot \frac{\text{DoD}\% - 80}{100}\right)$$
-- **LFP (Lithium Iron Phosphate)**: Nominal cycle life $N_{\text{nominal}} = 2,800$ cycles, $\alpha = 0.85$.
-- **NMC (Nickel Manganese Cobalt)**: Nominal cycle life $N_{\text{nominal}} = 1,600$ cycles, $\alpha = 0.95$.
+
+```
+Loss_cyclic = 20.0 * (N_cycles / N_nominal)^alpha * (1 + 0.6 * (DoD% - 80) / 100)
+```
+
+- **LFP (Lithium Iron Phosphate)**: Nominal cycle life `N_nominal = 2,800` cycles, `alpha = 0.85`.
+- **NMC (Nickel Manganese Cobalt)**: Nominal cycle life `N_nominal = 1,600` cycles, `alpha = 0.95`.
 
 ### 2. Calendar Aging & Arrhenius Thermal Acceleration
-$$\text{Loss}_{\text{calendar}} = (\text{Cal}_{\text{rate}} \times 100) \times t_{\text{years}} \times e^{\gamma \cdot (T_{\text{avg}} - 25)}$$
-- **LFP**: Baseline calendar decay $= 1.2\%$/year, thermal sensitivity $\gamma = 0.025$.
-- **NMC**: Baseline calendar decay $= 2.2\%$/year, thermal sensitivity $\gamma = 0.045$.
 
-$$\text{SOH}\% = 100 - (\text{Loss}_{\text{cyclic}} + \text{Loss}_{\text{calendar}})$$
+```
+Loss_calendar = (Cal_rate * 100) * Age_years * e^(gamma * (Temp - 25))
+```
+
+- **LFP**: Baseline calendar decay `= 1.2%/year`, thermal sensitivity `gamma = 0.025`.
+- **NMC**: Baseline calendar decay `= 2.2%/year`, thermal sensitivity `gamma = 0.045`.
+
+### 3. Total State of Health (SOH %)
+
+```
+SOH% = 100 - (Loss_cyclic + Loss_calendar)
+```
 
 ---
 
@@ -37,23 +49,23 @@ $$\text{SOH}\% = 100 - (\text{Loss}_{\text{cyclic}} + \text{Loss}_{\text{calenda
 ### 1. Two-Stage Valuation & Verification Pipeline
 - **Stage 1 (Provisional Estimate)**: Computes online estimate from self-reported data (Vehicle category, chemistry, age, km/cycles, DoD%, temp). Labeled as *"Estimated SOH based on usage history"*.
 - **Stage 2 (Doorstep Physical Verification)** (`src/engine/physicalVerification.js`):
-  - **BMS Logged Cycle Sync**: Compares BMS cycles vs self-reported cycles. Deviations $>15\%$ trigger an automatic re-grading alert.
+  - **BMS Logged Cycle Sync**: Compares BMS cycles vs self-reported cycles. Deviations **> 15%** trigger an automatic re-grading alert.
   - **Terminal Voltage Check**: Applies SOH penalties for cell drop/imbalance if measured voltage falls below nominal thresholds.
-  - **Physical Damage Check**: Casing/water/structural damage caps the grade at Grade C or Reject.
+  - **Physical Damage Check**: Casing, water, or structural damage caps the grade at Grade C or Reject.
 
 ### 2. Tiered Grading & Warranty Matrix (`src/engine/gradingAndWarranty.js`)
-- **Grade A (>80% SOH)**: BESS Commercial Storage & Solar Micro-Grids (36-Month Prorated Warranty, $\ge 70\%$ capacity guarantee).
-- **Grade B (65–80% SOH)**: Telecom Tower Backup (18-Month Prorated Warranty, $\ge 55\%$ capacity guarantee).
-- **Grade C (50–65% SOH)**: Low-Stakes Emergency UPS (As-Is / 90-Day DOA replacement).
-- **Reject (<50% SOH)**: Black Mass Recycling (Safe Transfer Clearance).
+- **Grade A (> 80% SOH)**: BESS Commercial Storage & Solar Micro-Grids (36-Month Prorated Warranty, >= 70% capacity guarantee).
+- **Grade B (65% – 80% SOH)**: Telecom Tower Backup (18-Month Prorated Warranty, >= 55% capacity guarantee).
+- **Grade C (50% – 65% SOH)**: Low-Stakes Emergency UPS (As-Is / 90-Day DOA replacement).
+- **Reject (< 50% SOH)**: Black Mass Recycling (Safe Transfer Clearance).
 
 ### 3. Seller Payout & EPR Credit Model (`src/engine/valuationEngine.js`)
-- $\text{Total Payout} = \text{Platform Base Valuation} + \text{Estimated EPR Credit (BWMR 2022)}$.
-- EPR Credit Rate: ₹520/kWh for LFP and ₹680/kWh for NMC.
-- Benchmarked against un-graded informal scrap (~₹1,450/kWh).
+- **Total Payout = Platform Base Valuation + Estimated EPR Credit (BWMR 2022)**
+- **EPR Credit Rate**: ₹520 / kWh for LFP and ₹680 / kWh for NMC.
+- Benchmarked against un-graded informal scrap (~₹1,450 / kWh).
 
 ### 4. Institutional B2B Secondary Exchange
-- Bulk procurement quote calculator benchmarked against New Lead-Acid (~₹5,200/kWh) and New Lithium (~₹12,500/kWh), including avoided manufacturing $\text{CO}_2$ offset calculations (~85 kg $\text{CO}_2$/kWh).
+- Bulk procurement quote calculator benchmarked against New Lead-Acid (~₹5,200 / kWh) and New Lithium (~₹12,500 / kWh), including avoided manufacturing CO2 offset calculations (~85 kg CO2 / kWh).
 
 ---
 
