@@ -1,17 +1,8 @@
-/**
- * ============================================================================
- *  BATTERY AGGREGATION & GRADING PLATFORM — FRONTEND APPLICATION LOGIC
- *  Connects HTML UI to pure gradingEngine.js calculation library & Chart.js
- * ============================================================================
- */
-
 'use strict';
 
-// Store current provisional result globally for Stage 2 technician verification
 let currentProvisionalResult = null;
 let degradationChartInstance = null;
 
-// Preset Vehicle Profiles
 const PRESETS = {
   ola: {
     category: '2W',
@@ -45,15 +36,12 @@ const PRESETS = {
 document.addEventListener('DOMContentLoaded', () => {
   initTabNavigation();
   handleCategoryChange();
-  runProvisionalValuation(); // Initial calculation with defaults
+  runProvisionalValuation();
   renderB2BPool();
   runB2BQuote();
   initSimChart();
 });
 
-/**
- * Tab Navigation Setup
- */
 function initTabNavigation() {
   const tabs = document.querySelectorAll('.tab-btn');
   tabs.forEach(tab => {
@@ -66,7 +54,6 @@ function initTabNavigation() {
       const targetPane = document.getElementById(targetTabId);
       if (targetPane) targetPane.classList.add('active');
 
-      // Trigger chart resize if switching to simulator tab
       if (targetTabId === 'tab-simulator' && degradationChartInstance) {
         setTimeout(() => degradationChartInstance.resize(), 100);
       }
@@ -74,9 +61,6 @@ function initTabNavigation() {
   });
 }
 
-/**
- * Preset button click handler
- */
 function applyPreset(presetKey) {
   const p = PRESETS[presetKey];
   if (!p) return;
@@ -93,9 +77,6 @@ function applyPreset(presetKey) {
   runProvisionalValuation();
 }
 
-/**
- * Handle category dropdown change (updates capacity defaults & cycle text)
- */
 function handleCategoryChange() {
   const cat = document.getElementById('vehicleCategory').value;
   const spec = window.GradingEngine.VEHICLE_SPECS[cat];
@@ -107,9 +88,6 @@ function handleCategoryChange() {
   syncCyclesFromKm();
 }
 
-/**
- * Update cycle count indicator when odometer km changes
- */
 function syncCyclesFromKm() {
   const cat = document.getElementById('vehicleCategory').value;
   const km = Number(document.getElementById('odometerKm').value) || 0;
@@ -123,16 +101,12 @@ function syncCyclesFromKm() {
     helpEl.innerText = `Est. Cycle Count: ~${cycles.toLocaleString()} cycles (based on ~${kmPerCycle} km/cycle for ${cat})`;
   }
 
-  // Sync Stage 2 BMS cycle default
   const bmsInput = document.getElementById('techBmsCycles');
   if (bmsInput && (!bmsInput.dataset.userEdited || bmsInput.dataset.userEdited === 'false')) {
     bmsInput.value = cycles;
   }
 }
 
-/**
- * STAGE 1: Calculate & Render Provisional Valuation
- */
 function runProvisionalValuation() {
   const category = document.getElementById('vehicleCategory').value;
   const chemistry = document.getElementById('batteryChemistry').value;
@@ -142,7 +116,6 @@ function runProvisionalValuation() {
   const dodPercent = Number(document.getElementById('avgDoD').value) || 80;
   const avgTempC = Number(document.getElementById('avgTemp').value) || 30;
 
-  // Run calculation engine
   currentProvisionalResult = window.GradingEngine.calculateProvisionalSOH({
     category,
     chemistry,
@@ -155,7 +128,6 @@ function runProvisionalValuation() {
 
   const res = currentProvisionalResult;
 
-  // Render DOM elements
   document.getElementById('provSohVal').innerText = `${res.estimatedSOH}%`;
   document.getElementById('provSohVal').style.color = res.gradeBadgeColor;
 
@@ -168,7 +140,6 @@ function runProvisionalValuation() {
 
   document.getElementById('provGradeName').innerText = res.secondLifeApplication.split(',')[0];
 
-  // Capacity Progress Meter Fill
   const meterFill = document.getElementById('sohMeterFill');
   const meterLabel = document.getElementById('sohMeterLabel');
   if (meterFill) {
@@ -177,14 +148,12 @@ function runProvisionalValuation() {
   }
   if (meterLabel) meterLabel.innerText = `${res.estimatedSOH}% SOH`;
 
-  // Loss Attribution Breakdown
   if (document.getElementById('provCyclicLoss')) {
     document.getElementById('provCyclicLoss').innerText = `${res.degradationBreakdown.cyclicLossPercent}%`;
     document.getElementById('provCalendarLoss').innerText = `${res.degradationBreakdown.calendarLossPercent}%`;
     document.getElementById('provThermalMult').innerText = `${res.degradationBreakdown.arrheniusThermalMultiplier}x`;
   }
 
-  // Payout rendering
   document.getElementById('provTotalPayout').innerText = `₹${res.payout.totalPayoutINR.toLocaleString('en-IN')}`;
   document.getElementById('provBasePayout').innerText = `₹${res.payout.platformBasePayoutINR.toLocaleString('en-IN')}`;
   document.getElementById('provEprCredit').innerText = `₹${res.payout.estimatedEPRCreditINR.toLocaleString('en-IN')}`;
@@ -199,16 +168,11 @@ function runProvisionalValuation() {
     premiumEl.style.color = 'var(--text-muted)';
   }
 
-  // Warranty
   document.getElementById('provWarrantyTerms').innerText = res.warranty.terms;
 
-  // Run Stage 2 Technician calculation to keep in sync
   runVerifiedValuation();
 }
 
-/**
- * STAGE 2: Doorstep Technician Inspection & Verification
- */
 function runVerifiedValuation() {
   if (!currentProvisionalResult) return;
 
@@ -217,13 +181,11 @@ function runVerifiedValuation() {
   const bmsAccessible = document.getElementById('techBmsAccessible').checked;
   const bmsCycles = Number(document.getElementById('techBmsCycles').value);
 
-  // Toggle BMS input visibility
   const bmsCyclesGroup = document.getElementById('bmsCyclesGroup');
   if (bmsCyclesGroup) {
     bmsCyclesGroup.style.display = bmsAccessible ? 'block' : 'none';
   }
 
-  // Run Stage 2 calculation engine
   const verifiedRes = window.GradingEngine.calculateVerifiedSOH(currentProvisionalResult, {
     hasVisualDamage,
     measuredVoltage,
@@ -231,7 +193,6 @@ function runVerifiedValuation() {
     bmsCycles
   });
 
-  // Render Verified DOM elements
   document.getElementById('verSohVal').innerText = `${verifiedRes.verifiedSOH}%`;
   document.getElementById('verSohVal').style.color = verifiedRes.verifiedBadgeColor;
 
@@ -257,7 +218,6 @@ function runVerifiedValuation() {
     diffEl.style.color = 'var(--accent-emerald)';
   }
 
-  // Inspection flags list
   const flagsContainer = document.getElementById('verInspectionFlags');
   flagsContainer.innerHTML = '';
   verifiedRes.inspection.verificationFlags.forEach(flag => {
@@ -274,9 +234,6 @@ function runVerifiedValuation() {
   });
 }
 
-/**
- * Render B2B Aggregated Supply Pool Table
- */
 function renderB2BPool() {
   const tbody = document.querySelector('#poolTable tbody');
   if (!tbody) return;
@@ -306,9 +263,6 @@ function renderB2BPool() {
   });
 }
 
-/**
- * Run B2B Institutional Quote Calculation
- */
 function runB2BQuote() {
   const segment = document.getElementById('b2bSegment').value;
   const capacityKWh = Number(document.getElementById('b2bCapacityKWh').value) || 100;
@@ -338,9 +292,6 @@ function runB2BQuote() {
   document.getElementById('b2bCo2Offset').innerText = `${quote.co2OffsetTons} Tons CO₂ Avoided`;
 }
 
-/**
- * Initialize Chart.js SOH Degradation Curve Simulator
- */
 function initSimChart() {
   const ctx = document.getElementById('degradationChart');
   if (!ctx) return;
@@ -394,21 +345,16 @@ function initSimChart() {
   updateSimChart();
 }
 
-/**
- * Update Simulator Chart when sliders move
- */
 function updateSimChart() {
   const chemistry = document.getElementById('simChemistry').value;
   const ageYears = Number(document.getElementById('simAge').value) || 3;
   const dodPercent = Number(document.getElementById('simDoD').value) || 80;
   const avgTempC = Number(document.getElementById('simTemp').value) || 32;
 
-  // Update slider label displays
   document.getElementById('simAgeVal').innerText = `${ageYears} yrs`;
   document.getElementById('simDoDVal').innerText = `${dodPercent} %`;
   document.getElementById('simTempVal').innerText = `${avgTempC} °C`;
 
-  // Generate 0 to 3500 cycles points
   const cyclePoints = [0, 300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300];
   const lfpSoh = [];
   const nmcSoh = [];
@@ -444,19 +390,8 @@ function updateSimChart() {
     degradationChartInstance.update();
   }
 
-  // Update text summary box
   const summaryEl = document.getElementById('simSummaryText');
   if (summaryEl) {
-    const selectedRes = window.GradingEngine.calculateProvisionalSOH({
-      category: '3W',
-      chemistry,
-      ageYears,
-      cycleCount: 1200,
-      dodPercent,
-      avgTempC,
-      packCapacityKWh: 7.5
-    });
-
     summaryEl.innerHTML = `
       <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.25rem;">
         Degradation Comparison at 1,200 Cycles (${ageYears} Yrs, ${avgTempC}°C, ${dodPercent}% DoD):
@@ -467,12 +402,9 @@ function updateSimChart() {
   }
 }
 
-/**
- * Filter B2B Inventory Pool Table by Grade Tier
- */
 function filterB2BPool(selectedTier) {
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
 
   const tbody = document.querySelector('#poolTable tbody');
   if (!tbody) return;
@@ -504,9 +436,6 @@ function filterB2BPool(selectedTier) {
   });
 }
 
-/**
- * Certificate Modal Handlers
- */
 function openCertificateModal() {
   if (!currentProvisionalResult) return;
 
@@ -577,9 +506,6 @@ function closeCertificateModal() {
   if (modal) modal.classList.remove('active');
 }
 
-/**
- * Calculation Trace Modal Handlers
- */
 function openCalculationTraceModal() {
   if (!currentProvisionalResult) return;
 
@@ -618,4 +544,3 @@ function closeCalculationTraceModal() {
   const modal = document.getElementById('traceModal');
   if (modal) modal.classList.remove('active');
 }
-
