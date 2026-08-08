@@ -10,7 +10,7 @@
 
 **Re-Energize EV** is an end-to-end aggregation and valuation platform for retired EV batteries in India. It bridges individual EV owners/fleet operators (B2C Sourcing) with institutional secondary energy storage buyers (B2B Telecom Towers, Solar Micro-Grids, Commercial UPS).
 
-The core of the platform is an **Empirical Electrochemistry Degradation Engine** that computes dynamic State-of-Health (SOH), 4-tier grade classification, prorated performance warranty terms, itemized Extended Producer Responsibility (EPR) credit payouts, and doorstep physical technician verification.
+The core of the platform is an **Empirical Electrochemistry Degradation Engine** built with a **Clean Modular ES Architecture** that computes dynamic State-of-Health (SOH), 4-tier grade classification, prorated performance warranty terms, itemized Extended Producer Responsibility (EPR) credit payouts, and doorstep physical technician verification.
 
 ---
 
@@ -49,19 +49,33 @@ The core of the platform is an **Empirical Electrochemistry Degradation Engine**
 
 ---
 
-## 📦 Project Architecture
+## 📦 Modular Project Architecture
+
+The platform follows a clean, decoupled ES module architecture:
 
 ```
-├── index.html        # Responsive Single-Page SaaS Application UI
-├── style.css         # Stripe/Linear-style Light Mode Design System
-├── app.js            # Frontend Interactions, Modals, Filters & Chart.js Integration
-├── gradingEngine.js  # Pure JavaScript Backend Electrochemistry Physics & Valuation Engine
-└── README.md         # Documentation
+VentureX/
+├── package.json                   # ESM module configuration & npm test scripts
+├── src/
+│   ├── config/
+│   │   ├── vehicleSpecs.js        # Vehicle category specs & voltage defaults (2W, 3W, 4W)
+│   │   ├── chemistryConfig.js     # Degradation constants & cycle limits (LFP vs NMC)
+│   │   └── marketBenchmarks.js    # EPR credit rates, informal scrap & replacement benchmarks
+│   ├── engine/
+│   │   ├── degradationModel.js    # SOH degradation math (Power-law cyclic + Arrhenius calendar)
+│   │   ├── physicalVerification.js# Stage 2 doorstep technician verification logic & BMS sync
+│   │   ├── gradingAndWarranty.js  # Grade tier mapping (A/B/C/Reject) & warranty terms
+│   │   └── valuationEngine.js     # Seller payout & B2B institutional bulk pricing calculators
+│   └── index.js                   # Unified ES Module entry point & browser window global exporter
+├── index.html                     # Responsive Light-Mode SaaS Application UI
+├── app.js                         # UI interactions, modals, filters & Chart.js simulator
+├── style.css                      # Stripe/Linear-style Light Mode Design System
+└── README.md                      # Platform documentation
 ```
 
 ---
 
-## 🛠️ Quick Start / Local Setup
+## 🛠️ Quick Start & Testing
 
 1. **Clone Repository**:
    ```bash
@@ -69,7 +83,12 @@ The core of the platform is an **Empirical Electrochemistry Degradation Engine**
    cd VentureX
    ```
 
-2. **Run Locally**:
+2. **Run ES Module Tests**:
+   ```bash
+   npm test
+   ```
+
+3. **Run Web Platform Locally**:
    Simply open `index.html` in any web browser, or launch a local web server:
    ```bash
    python -m http.server 8080
