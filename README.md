@@ -127,6 +127,9 @@ VentureX/
 
 ---
 
-## 👤 Author
+## 👥 About Team 'Team Incognito'
 
-- **Soumadipta Konar** ([GitHub](https://github.com/Soumadipta-Konar))
+- **Gyan Ranjan** — Technical Build
+- **Soumadipta Konar** — Business Model and Unit Economics
+- **Vijaya Laxmi Singh** — Pitch Deck
+- **Brinda Pal** — Research and Market Data
