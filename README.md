@@ -78,6 +78,29 @@ The core of the platform is an **Empirical Electrochemistry Degradation Engine**
 
 ---
 
+## 📊 Datasets & Future Strategic Roadmap
+
+### 1. Research Datasets for Offline Model Calibration
+- **NASA Ames Battery Aging Dataset**: Standard benchmark for capacity fade & internal resistance growth (B0005, B0006, B0007, B0018).
+- **CALCE Battery Research Dataset (Univ. of Maryland)**: LFP & NMC cell degradation data under varying thermal stresses ($25^\circ\text{C}$–$45^\circ\text{C}$) and C-rates.
+- **Stanford / MIT Battery Dataset (Severson et al.)**: 124 LFP/Graphite cells under dynamic charge/discharge profiles.
+- **Oxford Battery Degradation Dataset**: Long-term drive-cycle battery degradation logs.
+
+### 2. Proprietary Platform Sourced Datasets
+- **Doorstep Technician BMS Dump Logs**: OBD-II / CAN bus diagnostic log files extracted during Stage 2 pickup verification.
+- **OEM Telematics API Integrations**: Real-time charging logs synced via Indian EV Fleet APIs (Ather Grid / Ola Electric / Mahindra Last Mile Mobility).
+
+---
+
+## 🗺️ Future Strategic Roadmap
+
+- **Phase 1 (Q1-Q2)**: Doorstep OBD-II / BMS Hardware Dongle for automated 60-second diagnostic health verification.
+- **Phase 2 (Q3-Q4)**: Physics-Informed Neural Network (PINN) automated re-calibration using regional Indian thermal data ($35^\circ\text{C}$–$48^\circ\text{C}$).
+- **Phase 3 (Year 2)**: Automated EPR Credit Clearinghouse & Direct Integration with Central Pollution Control Board (CPCB) EPR Portal.
+- **Phase 4 (Year 2-3)**: Secondary Storage-as-a-Service (ESaaS) leasing for Indian Telecom Towers (Indus Towers) & Solar Micro-Grids.
+
+---
+
 ## 📜 Compliance & Citations
 
 - **Regulatory Compliance**: Extended Producer Responsibility (EPR) credit mechanisms aligned with the **Battery Waste Management Rules (BWMR) 2022** notified by the Ministry of Environment, Forest and Climate Change (MoEFCC), Govt of India.
